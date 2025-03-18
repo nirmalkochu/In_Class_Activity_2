@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-configmap
+  namespace: db
+data:
+  MYSQL_DATABASE: "wordpress"
+  MYSQL_USER: "wordpress"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+  namespace: db
+type: Opaque
+data:
+  MYSQL_PASSWORD: "d29yZHByZXNz"
+  MYSQL_ROOT_PASSWORD: "c29tZXdvcmRwcmVzcw=="
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+  namespace: db
+spec:
+  selector:
+    matchLabels:
+      id: c0924469          # Pod label to be used by Service to select the pods from this deployment
+  replicas: 3             # number of replica of the Pods
+  template:
+    metadata:
+      labels:
+        id: c0924469
+        app: db
+        env: dev
+    spec:
+      containers:
+      - name: db-container
+        image: mariadb:10.6.4-focal      # which image it will use
+        ports:
+        - containerPort: 3306
+        envFrom:
+          - configMapRef:
+              name: db-configmap
+              optional: false
+          - secretRef:
+              name: db-secret
+              optional: false   # Port exposed by container inside the Pod
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: db
+  labels:
+    version: v1     # label of the service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3306        # the port on which the service is listening
+    protocol: TCP
+    targetPort: 3306     # the port exposed by Pod (we defined in the deployment as part of `containerPort)
+  selector:
+    id: c0924469      # Pod label that service is using to select Pods
+
+---

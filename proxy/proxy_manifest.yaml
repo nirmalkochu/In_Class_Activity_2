@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-deployment
+  namespace: proxy
+spec:
+  selector:
+    matchLabels:
+      id: c0924469          # Pod label to be used by Service to select the pods from this deployment
+  replicas: 3              # number of replica of the Pods
+  template:
+    metadata:
+      labels:
+        id: c0924469
+        app: nginx-app
+        env: dev
+    spec:
+      containers:
+      - name: proxy-container
+        image: nirmal777/nginx-proxy-wp:v1      # which image it will use
+        ports:
+        - containerPort: 80 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-service
+  namespace: proxy
+  labels:
+    version: v1      # label of the service
+spec:
+  type: NodePort
+  ports:
+  - port: 80        # the port on which the service is listening
+    protocol: TCP
+    targetPort: 80     # the port exposed by Pod (we defined in the deployment as part of `containerPort)
+  selector:
+    id: c0924469       # Pod label that service is using to select Pods
+
+---
