@@ -4,7 +4,7 @@ metadata:
   name: wp-configmap
   namespace: wp
 data:
-  WORDPRESS_DB_HOST: "db-service.db.svc.cluster.local"    ### has namespace so no need namspace
+  WORDPRESS_DB_HOST: "db-service.db.svc.cluster.local"    
   WORDPRESS_DB_USER: "wordpress"
   WORDPRESS_DB_NAME: "wordpress"
 
@@ -46,7 +46,7 @@ spec:
               optional: false
           - secretRef:
               name: wp-secret
-              optional: false   # Port exposed by container inside the Pod
+              optional: false   
 ---
 apiVersion: v1
 kind: Service

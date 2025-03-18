@@ -48,7 +48,7 @@ spec:
               optional: false
           - secretRef:
               name: db-secret
-              optional: false   # Port exposed by container inside the Pod
+              optional: false   
 
 
 ---
